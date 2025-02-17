@@ -18,24 +18,25 @@ const UserPortal = () => {
     const navigate = useNavigate();
 
     // Fetch approved events for the calendar
+     // Fetch approved events for the calendar
     useEffect(() => {
-        const fetchApprovedEvents = async () => {
-            try {
-                const response = await axios.get("http://localhost:8080/api/requests/approved");
-        
-                const eventsData = response.data.map((event) => {
-                    const [year, month, day, hour, minute] = event.requestedDateTime;
-                    return {
-                        title: event.purpose,
-                        date: event.requestedDateTime, // Adjust month
-                    };
-                });
-        
-                setEvents(eventsData);
-            } catch (error) {
-                console.error("Error fetching approved events:", error);
-            }
-        };
+    const fetchApprovedEvents = async () => {
+        try {
+            const response = await axios.get("http://localhost:8080/api/requests/approved");
+    
+            const eventsData = response.data.map((event) => {
+                const [year, month, day, hour, minute] = event.requestedDateTime;
+                return {
+                    title: event.purpose,
+                    date: new Date(year, month - 1, day, hour, minute).toISOString().split("T")[0], // Adjust month
+                };
+            });
+    
+            setEvents(eventsData);
+        } catch (error) {
+            console.error("Error fetching approved events:", error);
+        }
+    };
         
 
         fetchApprovedEvents();

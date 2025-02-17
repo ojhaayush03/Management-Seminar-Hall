@@ -12,7 +12,8 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:5173"); // Restrict to React dev server
+        config.addAllowedOrigin("http://localhost:5174");// Restrict to React dev server
+        config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedHeader("*"); // Allow all headers
         config.addAllowedMethod("*"); // Allow all HTTP methods
         config.setAllowCredentials(true); // Allow credentials if needed
