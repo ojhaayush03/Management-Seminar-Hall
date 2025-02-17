@@ -30,4 +30,12 @@ public class RequestService {
         return requestRepository.findByStatus(Request.Status.APPROVED);
     }
 
+    public Request getRequestById(Long id) {
+        return requestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Request not found with id: " + id));
+    }
+
+    public List<Request> getRejectedRequests() {
+        return requestRepository.findByStatus(Request.Status.REJECTED);
+    }
 }

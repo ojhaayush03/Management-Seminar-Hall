@@ -25,6 +25,9 @@ public class Request {
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
 
+    @Column(nullable = true)
+    private String pdfPath;
+
     public enum Status {
         PENDING,
         APPROVED,
@@ -78,5 +81,13 @@ public class Request {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getPdfPath() {
+        return pdfPath;
+    }
+
+    public void setPdfPath(String pdfPath) {
+        this.pdfPath = pdfPath;
     }
 }
