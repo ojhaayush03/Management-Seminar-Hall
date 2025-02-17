@@ -5,6 +5,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 import axios from "axios";
 import { getFirestore, collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { app } from "../services/firebase";
+import { Link } from 'react-router-dom';
+
 
 const AdminPortal = () => {
   const [requests, setRequests] = useState([]);
@@ -109,33 +111,102 @@ const AdminPortal = () => {
   };
 
   // Function to add new admin
-  const handleCreateAdmin = async (e) => {
-    e.preventDefault();
-    try {
-      // Check if email already exists in admin collection
-      const adminRef = collection(db, "admins");
-      const q = query(adminRef, where("email", "==", newUser.email));
-      const querySnapshot = await getDocs(q);
-      
-      if (!querySnapshot.empty) {
-        setMessage("This email is already registered as an admin");
-        return;
-      }
+  // Function to add new admin
+const handleCreateAdmin = async (e) => {
+  e.preventDefault();
+  try {
+    // Check if email already exists in admin collection
+    const adminRef = collection(db, "admins");
+    const q = query(adminRef, where("email", "==", newUser.email));
+    const querySnapshot = await getDocs(q);
 
-      // Add new admin to Firebase
-      await addDoc(collection(db, "admins"), {
-        email: newUser.email,
-        name: newUser.name,
-        createdAt: new Date()
-      });
-
-      setMessage("Admin created successfully!");
-      setNewUser({ name: "", email: "", role: "" }); // Reset form
-    } catch (error) {
-      console.error("Error creating admin:", error);
-      setMessage("Error creating admin. Please try again.");
+    if (!querySnapshot.empty) {
+      setMessage("This email is already registered as an admin");
+      return;
     }
-  };
+
+    // Add new admin to Firebase
+    await addDoc(collection(db, "admins"), {
+      email: newUser.email,
+      name: newUser.name,
+      createdAt: new Date()
+    });
+
+    // Make POST request to register the admin in MySQL database
+    const response = await fetch("http://localhost:8080/api/users/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: newUser.name,
+        email: newUser.email,
+        role: "ADMIN"
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to register admin in MySQL");
+    }
+
+    setMessage("Admin created successfully!");
+    setNewUser({ name: "", email: "", role: "" }); // Reset form
+  } catch (error) {
+    console.error("Error creating admin:", error);
+    setMessage("Error creating admin. Please try again.");
+  }
+};
+
+const handleCreateSeminarHall = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await axios.post(
+      "http://localhost:8080/api/seminarhalls",
+      seminarHall
+    );
+    setMessage("Seminar hall created successfully!");
+    setSeminarHall({ name: "", capacity: "", location: "", facilities: "" });
+  } catch (error) {
+    console.error("Error creating seminar hall:", error);
+    setMessage("Error creating seminar hall. Please try again.");
+  }
+};
+
+const handleUpdateSeminarHall = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await axios.put(
+      `http://localhost:8080/api/seminarhalls/${selectedHallId}`,
+      seminarHall
+    );
+    setMessage("Seminar hall updated successfully!");
+    setSelectedHallId(null);
+    setSeminarHall({ name: "", capacity: "", location: "", facilities: "" });
+  } catch (error) {
+    console.error("Error updating seminar hall:", error);
+    setMessage("Error updating seminar hall. Please try again.");
+  }
+};
+
+const handleDeleteSeminarHall = async (id) => {
+  try {
+    await axios.delete(`http://localhost:8080/api/seminarhalls/${id}`);
+    setMessage("Seminar hall deleted successfully!");
+  } catch (error) {
+    console.error("Error deleting seminar hall:", error);
+    setMessage("Error deleting seminar hall. Please try again.");
+  }
+};
+const seminarHallMapping = {
+  1: 'CSE Seminar Hall',
+  2: 'Mechanical Seminar Hall',
+  3: 'ISE Seminar Hall',
+  4: 'IEM Seminar Hall',
+  5: 'Civil Seminar Hall',
+  6: 'ECE Seminar Hall',
+  7: 'MCA Seminar Hall',
+};
+
 
   return (
     <div className="admin-portal">
@@ -143,7 +214,26 @@ const AdminPortal = () => {
     <div style={{ borderTop: "1px solid white", margin: "20px 0" }}></div>
 
       <h1>Admin Portal</h1>
+       {/* Manage Seminar Halls Button */}
+    <div style={{ position: 'absolute', top: '30px', right: '20px' }}>
+      <Link to="/seminar-portal">
+        <button
+          style={{
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            padding: '8px 16px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+        >
+          Manage Seminar Halls
+        </button>
+      </Link>
+    </div>
       <div style={{ borderTop: "1px solid white", margin: "20px 0" }}></div>
+
+
 
       <div className="calendar-container">
         <FullCalendar
@@ -164,7 +254,7 @@ const AdminPortal = () => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>User</th>
+            
             <th>Seminar Hall</th>
             <th>Date</th>
             <th>Purpose</th>
@@ -176,9 +266,9 @@ const AdminPortal = () => {
           {requests.map((request) => (
               <tr key={request.id}>
               <td>{request.id}</td>
-              <td>{request.userId}</td>{" "}
+              
               {/* Replace with actual user name if available */}
-              <td>{request.seminarHallId}</td>{" "}
+              <td>{seminarHallMapping[request.seminarHallId]}</td>{" "}
               {/* Replace with actual seminar hall name if available */}
               <td>{request.requestedDateTime}</td>
               <td>{request.purpose}</td>
@@ -285,7 +375,10 @@ const AdminPortal = () => {
             Create Admin
           </button>
         </form>
+        
       </div>
+        
+      
     </div>
   );
 };

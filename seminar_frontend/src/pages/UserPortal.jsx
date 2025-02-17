@@ -134,6 +134,15 @@ const UserPortal = () => {
             setIsSubmitting(false);
         }
     };
+    const seminarHallMapping = {
+        1: 'CSE Seminar Hall',
+        2: 'Mechanical Seminar Hall',
+        3: 'ISE Seminar Hall',
+        4: 'IEM Seminar Hall',
+        5: 'Civil Seminar Hall',
+        6: 'ECE Seminar Hall',
+        7: 'MCA Seminar Hall',
+      };
 
     return (
         <motion.div

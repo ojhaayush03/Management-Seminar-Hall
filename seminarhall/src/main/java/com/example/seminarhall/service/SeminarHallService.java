@@ -46,4 +46,6 @@ public class SeminarHallService {
     public void deleteSeminarHall(Long id) {
         seminarHallRepository.deleteById(id);
     }
+
+
 }

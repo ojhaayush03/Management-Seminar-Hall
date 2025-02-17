@@ -37,21 +37,37 @@ public class SeminarHallController {
     }
 
     // Create a New Seminar Hall (Admin Only)
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<SeminarHall> createHall(@Valid @RequestBody SeminarHall hall) {
         SeminarHall createdHall = seminarHallService.createSeminarHall(hall);
         return new ResponseEntity<>(createdHall, HttpStatus.CREATED);
     }
 
     // Update Seminar Hall Details (Admin Only)
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<SeminarHall> updateHall(@PathVariable Long id, @Valid @RequestBody SeminarHall hall) {
+        // Get the existing hall first
+        //SeminarHall existingHall = seminarHallService.findById(id);
+
+
+        // If the hall doesn't exist, return 404
+//        if (existingHall == null) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        // Update only the name and location fields
+//        existingHall.setName(hall.getName());
+//        existingHall.setLocation(hall.getLocation());
+
+        // Save the updated hall
         SeminarHall updatedHall = seminarHallService.updateSeminarHall(id, hall);
+
         return new ResponseEntity<>(updatedHall, HttpStatus.OK);
     }
 
+
     // Delete a Seminar Hall (Admin Only)
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteHall(@PathVariable Long id) {
         seminarHallService.deleteSeminarHall(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
